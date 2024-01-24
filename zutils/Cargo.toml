@@ -1,0 +1,33 @@
+[package]
+name = "zutils"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name="zutils"
+path="src/lib.rs"
+test=false
+
+[[bin]]
+name="zutil"
+path="src/bin/zutil.rs"
+test=false
+
+
+[dependencies]
+anyhow = "1.0.75"
+clap = { version = "4.4.6", features = ["derive"] }
+# Because Zilliqa prior to v9.3 doesn't have EIP-2718 transactions.
+ethers = { version = "2.0.10", features = ["legacy"] }
+ethers-rs = "0.2.3"
+gcp-bigquery-client = "0.18.0"
+home = "0.5.5"
+libc = "0.2.148"
+reqwest = "0.11.22"
+serde = { version = "1.0.192", features = [ "derive" ] }
+serde_json = "1.0.108"
+serde_yaml = "0.9.27"
+tokio = { version = "1.32.0", features = [ "full" ] }
+url = "2.4.1"
