@@ -51,3 +51,17 @@ impl SystemProcess {
         Ok(())
     }
 }
+
+pub fn kill(pid: i32, sig: i32) -> i32 {
+    unsafe { libc::kill(pid, sig) }
+}
+
+pub fn is_running(pid: &u32) -> Result<bool> {
+    let id = i32::try_from(*pid)?;
+    let result = kill(id, 0);
+    if result < 0 {
+        Ok(false)
+    } else {
+        Ok(true)
+    }
+}

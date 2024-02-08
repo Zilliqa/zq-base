@@ -11,6 +11,16 @@ pub struct ChildProcess {
     pub child: Child,
 }
 
+// Reap on termination and return the id.
+pub fn reap_on_termination(child: ChildProcess) -> Result<u32> {
+    let id = child
+        .child
+        .id()
+        .ok_or(anyhow!("Could not get child process id"))?;
+    tokio::spawn(async move { child.child.wait_with_output() });
+    Ok(id)
+}
+
 pub struct CommandOutput {
     pub success: bool,
     pub status_code: i32,
