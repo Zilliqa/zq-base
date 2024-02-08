@@ -1,6 +1,5 @@
 #![allow(unused_imports)]
 
-use crate::utils;
 use anyhow::{anyhow, Result};
 use gcp_bigquery_client::model::{
     dataset::Dataset, query_request::QueryRequest, range_partitioning::RangePartitioning,

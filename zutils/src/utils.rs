@@ -1,18 +1,10 @@
-// @todo A lot of this was shamelessly nicked from z - we should really make it its own crate.
-#![allow(unused_imports)]
-
 use anyhow::{anyhow, Result};
+use base64::prelude::*;
 use home;
-use libc;
-use std::collections::HashMap;
+use log::error;
 use std::env;
-use std::net::TcpListener;
-use std::os::unix::process::CommandExt as _;
 use std::path::Path;
 use std::path::PathBuf;
-use std::process::Stdio;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, Stdout};
-use tokio::process::{Child, Command};
 
 /// Get a string from a u8
 pub fn string_or_empty_from_u8(in_val: &[u8]) -> String {
@@ -59,4 +51,23 @@ pub fn relative_home_path(val: &str) -> Result<PathBuf> {
     let mut home_path = home::home_dir().ok_or(anyhow!("Can't get your home directory"))?;
     home_path.push(val);
     Ok(home_path)
+}
+
+/// Log an error and re-propagate
+pub fn with_error_logged<T>(result: Result<T>) -> Result<T> {
+    match result {
+        Ok(value) => Ok(value),
+        Err(error) => {
+            let error_message = &error;
+            error!("{error_message}");
+            Err(error)
+        }
+    }
+}
+
+pub fn decode_base64(value: &str) -> Option<String> {
+    BASE64_STANDARD
+        .decode(value)
+        .ok()
+        .and_then(|bytes| String::from_utf8(bytes).ok())
 }

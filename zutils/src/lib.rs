@@ -1,6 +1,12 @@
 pub mod bq;
 pub mod commands;
+pub mod containers;
+pub mod filters;
 pub mod network;
+pub mod process;
 pub mod queries;
+pub mod repo;
 pub mod script;
+pub mod security;
 pub mod utils;
+pub mod yaml;
