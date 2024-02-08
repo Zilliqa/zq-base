@@ -1,21 +1,13 @@
-#![allow(unused_imports)]
-
 use crate::{commands, utils};
 use anyhow::{anyhow, Result};
 use home;
-use libc;
 use reqwest;
 use std::collections::HashMap;
 use std::env;
-use std::net::TcpListener;
 use std::os::unix::fs::PermissionsExt as _;
-use std::os::unix::process::CommandExt as _;
-use std::path::Path;
 use std::path::PathBuf;
-use std::process::Stdio;
-use tokio::fs::{self, File, OpenOptions};
-use tokio::io::AsyncWrite;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, Stdout};
+use tokio::fs::{self, File};
+use tokio::io::AsyncWriteExt;
 
 pub struct Context {
     /// Dry run or really execute?

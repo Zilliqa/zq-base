@@ -1,20 +1,24 @@
-#![allow(unused_imports)]
-
 use crate::utils;
 use anyhow::{anyhow, Result};
 use libc;
 use std::collections::HashMap;
-use std::env;
-use std::net::TcpListener;
-use std::os::unix::process::CommandExt as _;
-use std::path::Path;
 use std::process::Stdio;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader, Stdout};
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, Command};
 
 /// Wrapper in case we later want to add stuff to it.
 pub struct ChildProcess {
     pub child: Child,
+}
+
+// Reap on termination and return the id.
+pub fn reap_on_termination(child: ChildProcess) -> Result<u32> {
+    let id = child
+        .child
+        .id()
+        .ok_or(anyhow!("Could not get child process id"))?;
+    tokio::spawn(async move { child.child.wait_with_output() });
+    Ok(id)
 }
 
 pub struct CommandOutput {
@@ -77,6 +81,12 @@ pub struct CommandBuilder {
     logged: bool,
 }
 
+impl Default for CommandBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Second cut at running commands, because the option list was getting waay too long.
 impl CommandBuilder {
     pub fn new() -> Self {
@@ -110,6 +120,11 @@ impl CommandBuilder {
 
     pub fn throw_on_failure(&mut self) -> &mut Self {
         self.throw_on_failure = true;
+        self
+    }
+
+    pub fn set_throw_on_failure(&mut self, throw_on_failure: bool) -> &mut Self {
+        self.throw_on_failure = throw_on_failure;
         self
     }
 
@@ -327,5 +342,22 @@ impl CommandBuilder {
             stdout: out.stdout,
             stderr: out.stderr,
         })
+    }
+}
+
+#[derive(Debug)]
+pub struct BackgroundCommand {
+    pub running: Child,
+}
+
+impl BackgroundCommand {
+    pub fn new(cmd: &str, args: Vec<&str>, env: Option<&HashMap<String, String>>) -> Result<Self> {
+        let result: Child;
+        if let Some(env_tbl) = env {
+            result = Command::new(cmd).args(args).envs(env_tbl).spawn()?;
+        } else {
+            result = Command::new(cmd).args(args).spawn()?;
+        }
+        Ok(BackgroundCommand { running: result })
     }
 }

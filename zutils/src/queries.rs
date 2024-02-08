@@ -1,6 +1,7 @@
 #![allow(unused_imports)]
-use crate::{bq, utils};
-use anyhow::{anyhow, Result};
+
+use crate::bq;
+use anyhow::Result;
 use ethers::types::H160;
 use gcp_bigquery_client::model::{
     dataset::Dataset, query_request::QueryRequest, range_partitioning::RangePartitioning,
