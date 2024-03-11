@@ -71,3 +71,8 @@ pub fn decode_base64(value: &str) -> Option<String> {
         .ok()
         .and_then(|bytes| String::from_utf8(bytes).ok())
 }
+
+pub fn encode_base64(value: &str) -> String {
+    BASE64_STANDARD
+        .encode(value)
+}

@@ -301,6 +301,9 @@ impl CommandBuilder {
         let mut child = self.spawn_logged().await?;
         let result = child.child.wait().await?;
         let code = result.code().unwrap_or(-1);
+        if self.throw_on_failure && !result.success() {
+            return Err(anyhow!("Command failed  - {0}", code));
+        }
         Ok(CommandOutput {
             success: result.success(),
             status_code: code,
