@@ -1,5 +1,6 @@
 use crate::utils;
 use anyhow::{anyhow, Result};
+use colored::{Color, Colorize};
 use libc;
 use std::collections::HashMap;
 use std::process::Stdio;
@@ -79,6 +80,7 @@ pub struct CommandBuilder {
     create_new_session: bool,
     /// Should we log the output, or return it?
     logged: bool,
+    color: Option<Color>,
 }
 
 impl Default for CommandBuilder {
@@ -100,6 +102,7 @@ impl CommandBuilder {
             display_str: None,
             create_new_session: false,
             logged: false,
+            color: None,
         }
     }
 
@@ -110,6 +113,11 @@ impl CommandBuilder {
 
     pub fn display(&mut self, what: &str) -> &mut Self {
         self.display_str = Some(what.to_string());
+        self
+    }
+
+    pub fn color(&mut self, what: Color) -> &mut Self {
+        self.color = Some(what);
         self
     }
 
@@ -253,6 +261,7 @@ impl CommandBuilder {
             .stderr
             .take()
             .ok_or(anyhow!("Cannot get process error"))?;
+        let current_color = self.color;
         tokio::spawn(async move {
             let mut out_reader = BufReader::new(output).lines();
             while let Some(line) = out_reader.next_line().await.unwrap_or(None) {
@@ -263,7 +272,11 @@ impl CommandBuilder {
                     real_line.push('\n');
                     real_line.push('>');
                     real_line.push_str(trimmed);
-                    let _ = tokio::io::stdout().write_all(real_line.as_bytes()).await;
+                    if let Some(color) = current_color {
+                        print!("{}", real_line.color(color));
+                    } else {
+                        let _ = tokio::io::stdout().write_all(real_line.as_bytes()).await;
+                    }
                 }
             }
         });
@@ -277,7 +290,11 @@ impl CommandBuilder {
                     real_line.push('\n');
                     real_line.push('!');
                     real_line.push_str(trimmed);
-                    let _ = tokio::io::stdout().write_all(real_line.as_bytes()).await;
+                    if let Some(color) = current_color {
+                        print!("{}", real_line.color(color));
+                    } else {
+                        let _ = tokio::io::stdout().write_all(real_line.as_bytes()).await;
+                    }
                 }
             }
         });
