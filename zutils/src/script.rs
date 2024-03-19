@@ -33,7 +33,7 @@ impl Context {
 
     pub async fn get_arch() -> Result<String> {
         let mut cmd = commands::CommandBuilder::new();
-        cmd.cmd("arch", &vec![]).silent();
+        cmd.cmd("arch", &[]).silent();
         let result = cmd.run_for_output().await?.sanitise_stdout()?;
         Ok(result)
     }
@@ -42,7 +42,7 @@ impl Context {
         let contents = fs::read_to_string("/etc/os-release").await?;
         let mut result = HashMap::new();
         // Read and parse the os_params() file.
-        let lines = contents.split("\n");
+        let lines = contents.split('\n');
         for l in lines {
             // Split at =
             if let Some(v) = l.find('=') {
@@ -76,14 +76,14 @@ impl Context {
     }
 
     pub async fn apt_update(&self) -> Result<()> {
-        let mut cmd = Command::as_root(&vec!["apt", "update"])?;
+        let mut cmd = Command::as_root(&["apt", "update"])?;
         self.modify_context(&mut cmd.cmd).await?;
         cmd.execute(self).await?;
         Ok(())
     }
 
     pub async fn apt_upgrade(&self) -> Result<()> {
-        let mut cmd = Command::as_root(&vec!["apt", "dist-upgrade"])?;
+        let mut cmd = Command::as_root(&["apt", "dist-upgrade"])?;
         self.modify_context(&mut cmd.cmd).await?;
         cmd.execute(self).await?;
         Ok(())
@@ -114,7 +114,7 @@ impl Context {
             let body = reqwest::get(url).await?.text().await?;
             let name_path = utils::string_from_path(&name_path)?;
             let mut cmd = commands::CommandBuilder::new();
-            cmd.cmd("gpg", &vec!["--dearmor", "-o", &name_path]);
+            cmd.cmd("gpg", &["--dearmor", "-o", &name_path]);
             cmd.run_logged_with_input(&body).await?;
             fs::set_permissions(name_path, std::fs::Permissions::from_mode(0o644)).await?;
         }
@@ -133,7 +133,7 @@ impl Context {
         Ok(())
     }
 
-    pub async fn as_root(&self, cmd: &Vec<&str>) -> Result<()> {
+    pub async fn as_root(&self, cmd: &[&str]) -> Result<()> {
         let mut cmd = Command::as_root(cmd)?;
         self.modify_context(&mut cmd.cmd).await?;
         cmd.execute(self).await?;
@@ -151,7 +151,7 @@ impl Context {
         let mut to_insert = String::new();
         for line in what {
             to_insert.push_str(line);
-            to_insert.push_str("\n");
+            to_insert.push('\n');
         }
         let mut inserted = false;
         if let Some(start_val) = contents.find(&id_begin_str) {
@@ -166,12 +166,12 @@ impl Context {
         }
         if !inserted {
             // Otherwise, it's not there - append it.
-            contents.push_str("\n");
+            contents.push('\n');
             contents.push_str(&id_begin_str);
-            contents.push_str("\n");
+            contents.push('\n');
             contents.push_str(&to_insert);
             contents.push_str(&id_end_str);
-            contents.push_str("\n");
+            contents.push('\n');
         }
         let mut f = File::create(&bashrc).await?;
         f.write_all(contents.as_bytes()).await?;
@@ -182,7 +182,7 @@ impl Context {
         // "bash" so that we re-source .bashrc
         // the -i here makes the shell interactive - the default .bashrc on Ubuntu refuses to do
         // anything otherwise. We need to source .bashrc or things like nvm won't be added to the path.
-        let mut cmd = Command::build("bash", &vec!["-c", cmd])?;
+        let mut cmd = Command::build("bash", &["-c", cmd])?;
         self.modify_context(&mut cmd.cmd).await?;
         cmd.execute(self).await?;
         Ok(())
@@ -191,7 +191,7 @@ impl Context {
     pub async fn gcloud_copy(&self, project: &str, zone: &str, src: &str, tgt: &str) -> Result<()> {
         let mut cmd = Command::build(
             "gcloud",
-            &vec![
+            &[
                 "compute",
                 "scp",
                 "--project",
@@ -223,7 +223,7 @@ impl Command {
         })
     }
 
-    pub fn as_root(args: &Vec<&str>) -> Result<Self> {
+    pub fn as_root(args: &[&str]) -> Result<Self> {
         let mut cmd = commands::CommandBuilder::new();
         cmd.cmd("sudo", args);
         Ok(Self {
@@ -233,7 +233,7 @@ impl Command {
         })
     }
 
-    pub fn build(cmd_str: &str, args: &Vec<&str>) -> Result<Self> {
+    pub fn build(cmd_str: &str, args: &[&str]) -> Result<Self> {
         let mut cmd = commands::CommandBuilder::new();
         cmd.cmd(cmd_str, args);
         Ok(Self {
