@@ -73,6 +73,5 @@ pub fn decode_base64(value: &str) -> Option<String> {
 }
 
 pub fn encode_base64(value: &str) -> String {
-    BASE64_STANDARD
-        .encode(value)
+    BASE64_STANDARD.encode(value)
 }

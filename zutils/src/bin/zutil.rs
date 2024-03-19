@@ -5,7 +5,6 @@ use ethers::abi::AbiEncode;
 use ethers::core::rand::thread_rng;
 use ethers::signers::{LocalWallet, Signer};
 use ethers::types::H160;
-use serde_json;
 use std::env;
 use zutils::{bq, queries};
 

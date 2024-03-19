@@ -17,7 +17,7 @@ pub fn reap_on_termination(child: ChildProcess) -> Result<u32> {
         .child
         .id()
         .ok_or(anyhow!("Could not get child process id"))?;
-    tokio::spawn(async move { child.child.wait_with_output() });
+    tokio::spawn(async move { child.child.wait_with_output().await });
     Ok(id)
 }
 
@@ -60,7 +60,7 @@ impl CommandOutput {
         self.sanitise_to_string(&self.stderr)
     }
 
-    pub fn sanitise_to_string(&self, input: &Vec<u8>) -> Result<String> {
+    pub fn sanitise_to_string(&self, input: &[u8]) -> Result<String> {
         let result = utils::string_or_empty_from_u8(input);
         Ok(result.trim().to_string())
     }
@@ -138,13 +138,13 @@ impl CommandBuilder {
         self
     }
 
-    pub fn cmd(&mut self, cmd: &str, args: &Vec<&str>) -> &mut Self {
+    pub fn cmd(&mut self, cmd: &str, args: &[&str]) -> &mut Self {
         self.cmd = Some(cmd.to_string());
         self.args = Some(args.iter().map(|x| x.to_string()).collect());
         self
     }
 
-    pub fn more_args(&mut self, args: &Vec<&str>) -> &mut Self {
+    pub fn more_args(&mut self, args: &[&str]) -> &mut Self {
         let converted_args: Vec<String> = args.iter().map(|x| x.to_string()).collect();
         match &mut self.args {
             None => self.args = Some(converted_args),
@@ -201,7 +201,7 @@ impl CommandBuilder {
             .as_ref()
             .ok_or(anyhow!("No command specified"))?
             .clone();
-        let mut cmd = Command::new(&cmd_name);
+        let mut cmd = Command::new(cmd_name);
         if self.display_command {
             println!("{0}", self.describe_command()?)
         }
@@ -239,7 +239,7 @@ impl CommandBuilder {
         let mut cmd = self.make_command()?;
         cmd.stdout(Stdio::piped());
         cmd.stderr(Stdio::piped());
-        if let Some(_) = input {
+        if input.is_some() {
             cmd.stdin(Stdio::piped());
         } else {
             cmd.stdin(Stdio::null());
@@ -257,7 +257,7 @@ impl CommandBuilder {
             let mut out_reader = BufReader::new(output).lines();
             while let Some(line) = out_reader.next_line().await.unwrap_or(None) {
                 let trimmed = line.trim();
-                if trimmed.len() > 0 {
+                if !trimmed.is_empty() {
                     let mut real_line = String::new();
                     real_line.push('\r');
                     real_line.push('\n');
@@ -271,7 +271,7 @@ impl CommandBuilder {
             let mut err_reader = BufReader::new(err).lines();
             while let Some(line) = err_reader.next_line().await.unwrap_or(None) {
                 let trimmed = line.trim();
-                if trimmed.len() > 0 {
+                if !trimmed.is_empty() {
                     let mut real_line = String::new();
                     real_line.push('\r');
                     real_line.push('\n');

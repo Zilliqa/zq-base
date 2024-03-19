@@ -7,7 +7,7 @@ pub async fn is_container_running(container_name: &str) -> Result<bool> {
     let is_running = CommandBuilder::new()
         .cmd(
             "docker",
-            &vec!["inspect", "-f", "{{.State.Running}}", container_name],
+            &["inspect", "-f", "{{.State.Running}}", container_name],
         )
         .run_logged()
         .await?;
@@ -71,12 +71,12 @@ pub async fn is_container_status_running(container_name: &str) -> Result<bool> {
 
 pub async fn kill_container(container_name: &str) -> Result<()> {
     let _ = CommandBuilder::new()
-        .cmd("docker", &vec!["kill", container_name])
+        .cmd("docker", &["kill", container_name])
         .ignore_failures()
         .run()
         .await?;
     let _ = CommandBuilder::new()
-        .cmd("docker", &vec!["rm", container_name])
+        .cmd("docker", &["rm", container_name])
         .ignore_failures()
         .run()
         .await?;
