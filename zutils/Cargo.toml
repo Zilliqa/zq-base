@@ -20,6 +20,7 @@ test=false
 anyhow = "1.0.75"
 base64 = "0.21.7"
 clap = { version = "4.4.6", features = ["derive"] }
+colored = "2.1.0"
 # Because Zilliqa prior to v9.3 doesn't have EIP-2718 transactions.
 ethers = { version = "2.0.10", features = ["legacy"] }
 ethers-rs = "0.2.3"
