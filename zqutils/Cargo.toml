@@ -1,0 +1,44 @@
+[package]
+name = "zqutils"
+version = "0.2.0"
+edition = "2021"
+license="MIT"
+description="A collection of utilities for writing programs at Zilliqa"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name="zqutils"
+path="src/lib.rs"
+test=false
+
+[[bin]]
+name="zqutil"
+path="src/bin/zutil.rs"
+test=false
+
+
+[dependencies]
+anyhow = "1.0.75"
+base64 = "0.21.7"
+clap = { version = "4.4.6", features = ["derive"] }
+colored = "2.1.0"
+ethers = { version = "2.0.14", features = ["legacy"] }
+gcp-bigquery-client = { version = "0.17.1" }
+home = "0.5.5"
+libc = "0.2.148"
+log = "0.4.20"
+rand = "0.8.5"
+rand_chacha = "0.3.1"
+regex = "1.10.3"
+reqwest = "0.11.22"
+semver = "1.0.21"
+serde = { version = "1.0.192", features = ["derive"] }
+serde_json = "1.0.108"
+serde_yaml = "0.9.27"
+sqlx = "0.7.3"
+sqlx-postgres = "0.7.3"
+sysctl = "0.5.5"
+sysinfo = "0.30.5"
+tokio = { version = "1.32.0", features = ["full"] }
+url = "2.4.1"
