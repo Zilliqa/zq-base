@@ -6,7 +6,7 @@ use ethers::core::rand::thread_rng;
 use ethers::signers::{LocalWallet, Signer};
 use ethers::types::H160;
 use std::env;
-use zutils::{bq, queries};
+use zqutils::{bq, queries};
 
 #[derive(Parser, Debug)]
 #[clap(about)]
