@@ -24,7 +24,7 @@ base64 = "0.21.7"
 clap = { version = "4.4.6", features = ["derive"] }
 colored = "2.1.0"
 ethers = { version = "2.0.14", features = ["legacy"] }
-gcp-bigquery-client = { version = "0.17.1" }
+gcp-bigquery-client = { version = "0.20.0" }
 home = "0.5.5"
 libc = "0.2.148"
 log = "0.4.20"
