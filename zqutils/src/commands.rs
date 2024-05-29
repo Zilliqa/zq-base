@@ -3,6 +3,7 @@ use anyhow::{anyhow, Result};
 use colored::{Color, Colorize};
 use libc;
 use std::collections::HashMap;
+use std::path::Path;
 use std::process::Stdio;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, Command};
@@ -175,6 +176,10 @@ impl CommandBuilder {
     pub fn env(&mut self, env: &HashMap<String, String>) -> &mut Self {
         self.env = Some(env.clone());
         self
+    }
+
+    pub fn current_dir(&mut self, dir: &Path) -> Result<&mut Self> {
+        Ok(self.cwd(&utils::string_from_path(dir)?))
     }
 
     pub fn cwd(&mut self, cwd: &str) -> &mut Self {
