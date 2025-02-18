@@ -351,11 +351,7 @@ impl CommandBuilder {
     pub async fn run_for_output(&self) -> Result<CommandOutput> {
         let mut cmd = self.make_command()?;
         let out = cmd.output().await?;
-        let result_code = if let Some(val) = out.status.code() {
-            val
-        } else {
-            -1
-        };
+        let result_code = out.status.code().unwrap_or(-1);
         if self.throw_on_failure && !out.status.success() {
             let output = &utils::string_or_empty_from_u8(&out.stdout);
             let error = &utils::string_or_empty_from_u8(&out.stderr);

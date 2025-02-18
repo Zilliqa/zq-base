@@ -1,4 +1,4 @@
-use zutils::commands::CommandBuilder;
+use zqutils::commands::CommandBuilder;
 
 #[tokio::test]
 async fn test_no_color() {
