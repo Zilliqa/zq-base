@@ -8,11 +8,7 @@ use std::path::PathBuf;
 
 /// Get a string from a u8
 pub fn string_or_empty_from_u8(in_val: &[u8]) -> String {
-    let result: &str = if let Ok(val) = std::str::from_utf8(in_val) {
-        val
-    } else {
-        "<not_representable>"
-    };
+    let result: &str = std::str::from_utf8(in_val).unwrap_or("<not_representable>");
     result.to_string()
 }
 
